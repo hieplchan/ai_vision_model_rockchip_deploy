@@ -1,2 +1,2 @@
-- Computer vision practice with ARM NEON, Mali GPU, NPU
+- Computer vision practice with ARM NEON, Mali GPU, NPU on RK3399
 - Hardware: http://rockpi.org/rockpi4
