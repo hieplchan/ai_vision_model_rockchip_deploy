@@ -1,1 +1,2 @@
-# rockchip-deeplearning-practices
+- Computer vision practice with ARM NEON, Mali GPU, NPU
+- Hardware: http://rockpi.org/rockpi4
