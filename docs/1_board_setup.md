@@ -4,21 +4,17 @@
 - Wifi setting: https://wiki.radxa.com/Rockpi4/Debian#WIFI_Connection 
 
 ```
-sudo su
-apt update && apt upgrade
-apt install -y wget
+sudo apt update && apt upgrade
+sudo apt install -y wget git autoconf libtool automake build-essential libglib2.0-dev autopoint libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev cmake ffmpeg
 ```
 
-## 1.1  Radxa package
-- Radxa APT: https://wiki.radxa.com/Rockpi4/radxa-apt
+# 2. OpenGL - OpenCL Test
+- Using glmark2-es2-drm: https://wiki.radxa.com/Rockpi4/Debian#Test_OpenGL_ES
+`sudo apt install opencl-headers`
+- Using clpeak: https://wiki.radxa.com/Rockpi4/dev/install-opencl#Sanity_Checkout_with_clpeak
 
+# 3. USB Camera
 ```
-export DISTRO=buster-stable
-echo "deb http://apt.radxa.com/$DISTRO/ ${DISTRO%-*} main" | sudo tee -a /etc/apt/sources.list.d/apt-radxa-com.list
-wget -O - apt.radxa.com/$DISTRO/public.key | sudo apt-key add -
-apt update && apt upgrade
-apt install -y rockchip-overlay
-apt install -y rockpi4b-rk-u-boot-latest
-apt install -y linux-base linux-4.4-latest
-reboot
+sudo apt install -y gstreamer1.0-rockchip1* librockchip-* rockchip-mpp*
+gst-launch-1.0 rkv4l2src device=/dev/video4 ! videoconvert ! autovideosink
 ```
