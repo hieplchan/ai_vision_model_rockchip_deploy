@@ -4,9 +4,10 @@
 - Wifi setting: https://wiki.radxa.com/Rockpi4/Debian#WIFI_Connection 
 
 ```
-sudo apt update && apt upgrade
-sudo apt install -y wget git autoconf libtool automake build-essential libglib2.0-dev autopoint libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev cmake ffmpeg opencl-headers
+sudo apt update && sudo apt upgrade
+sudo apt install -y wget git autoconf libtool automake build-essential libglib2.0-dev autopoint libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev cmake ffmpeg opencl-headers xfce4-power-manager curl make g++ unzip libfreeimage-dev libglew-dev
 ```
+- Using `xfce4-power-manager` to turn off power saving
 
 # 2. OpenGL - OpenCL Test
 - Using glmark2-es2-drm: https://wiki.radxa.com/Rockpi4/Debian#Test_OpenGL_ES
