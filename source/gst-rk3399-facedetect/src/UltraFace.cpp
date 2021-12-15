@@ -51,8 +51,11 @@ UltraFace::UltraFace(const std::string &mnn_path,
 
     ultraface_interpreter = std::shared_ptr<MNN::Interpreter>(MNN::Interpreter::createFromFile(mnn_path.c_str()));
     MNN::ScheduleConfig config;
+
+    // config.type = MNN_FORWARD_OPENCL;
+
     config.numThread = num_thread;
-    MNN::BackendConfig backendConfig;
+    MNN::BackendConfig backendConfig;    
     backendConfig.precision = (MNN::BackendConfig::PrecisionMode) 2;
     config.backendConfig = &backendConfig;
 
@@ -113,7 +116,8 @@ int UltraFace::detect(cv::Mat &raw_image, std::vector<FaceInfo> &face_list) {
     chrono::duration<double> elapsed = end - start;
     cout << "inference time:" << elapsed.count() << " s" << endl;
 
-    generateBBox(bbox_collection, tensor_scores, tensor_boxes);
+    generateBBox(bbox_collection, &tensor_scores_host, &tensor_boxes_host);
+    
     nms(bbox_collection, face_list);
     return 0;
 }

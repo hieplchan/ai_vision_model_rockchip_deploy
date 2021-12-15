@@ -24,4 +24,5 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
         MNN
+        MNN_CL
         ${OpenCV_LIBS})

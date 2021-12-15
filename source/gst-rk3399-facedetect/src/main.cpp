@@ -14,7 +14,9 @@ int main(int argc, char **argv) {
     }
 
     string mnn_path = argv[1];
-    UltraFace ultraface(mnn_path, 320, 240, 4, 0.65); // config model input
+    // UltraFace ultraface(mnn_path, 320, 240, 4, 0.65); // config model input
+
+    UltraFace ultraface(mnn_path, 320, 240, 1, 0.65); // Hiep
 
     for (int i = 2; i < argc; i++) {
         string image_file = argv[i];
