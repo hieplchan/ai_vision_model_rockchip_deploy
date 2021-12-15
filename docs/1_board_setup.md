@@ -18,3 +18,6 @@ sudo apt install -y wget git autoconf libtool automake build-essential libglib2.
 sudo apt install -y gstreamer1.0-rockchip1* librockchip-* rockchip-mpp*
 gst-launch-1.0 rkv4l2src device=/dev/video4 ! videoconvert ! autovideosink
 ```
+
+# 4. OpenCV build
+- Guide: https://wiki.radxa.com/Rockpi4/dev/build-opencv
