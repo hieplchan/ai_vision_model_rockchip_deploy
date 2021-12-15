@@ -22,6 +22,7 @@ make -j 6
 sudo make install
 ```
 
+# 2. Benchmark
 - Test benchmark: https://www.yuque.com/mnn/en/tool_benchmark
 ```
 ../build/benchmark.out models_folder [loop_count] [warmup] [forwardtype] [numberThread] [precision] [weightSparsity]
