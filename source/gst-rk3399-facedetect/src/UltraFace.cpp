@@ -8,7 +8,7 @@
 using namespace std;
 
 UltraFace::UltraFace(const std::string &mnn_path,
-                     int input_width, int input_length, int num_thread_,
+                     int input_width, int input_length, int num_thread_, bool is_open_cl,
                      float score_threshold_, float iou_threshold_, int topk_) {
     num_thread = num_thread_;
     score_threshold = score_threshold_;
@@ -51,10 +51,11 @@ UltraFace::UltraFace(const std::string &mnn_path,
 
     ultraface_interpreter = std::shared_ptr<MNN::Interpreter>(MNN::Interpreter::createFromFile(mnn_path.c_str()));
     MNN::ScheduleConfig config;
-
-    // config.type = MNN_FORWARD_OPENCL;
-
+    if (is_open_cl) {
+        config.type = MNN_FORWARD_OPENCL;
+    }
     config.numThread = num_thread;
+    
     MNN::BackendConfig backendConfig;    
     backendConfig.precision = (MNN::BackendConfig::PrecisionMode) 2;
     config.backendConfig = &backendConfig;
