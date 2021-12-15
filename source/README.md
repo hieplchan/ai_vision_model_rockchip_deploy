@@ -36,8 +36,8 @@ make -j 6
 ```
 sudo cp libgstrk3399facedetect.so  /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
-gst-launch-1.0 rkv4l2src device=/dev/video4 ! queue \
+gst-launch-1.0 rkv4l2src device=/dev/video4 \
 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! queue \
-! rk3399facedetect width=1280 height=720 ! queue \
+! rk3399facedetect width=1280 height=720 \
 ! autovideosink
 ```

@@ -17,10 +17,15 @@ file(GLOB SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     src/*
     inc/*)
 
+# MNN
+set(MNN_LIBRARY_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/mnn/lib)
+set(MNN_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/mnn/include)
+
 include_directories(
         ${OpenCV_INCLUDE_DIRS}
         ${GLIB_INCLUDE_DIRS}
         ${GSTREAMER_INCLUDE_DIRS}
+        ${MNN_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 
@@ -34,6 +39,8 @@ link_directories(
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
+        MNN
+        MNN_CL
         ${OpenCV_LIBS}
         ${GLIB2_LIBRARIES}
         ${GSTREAMER_LIBRARIES}

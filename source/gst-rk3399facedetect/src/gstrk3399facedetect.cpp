@@ -65,6 +65,9 @@
 #include <opencv2/imgproc/imgproc_c.h>
 
 #include "gstrk3399facedetect.h"
+#include "UltraFace.hpp"
+
+UltraFace *face_detector;
 
 GST_DEBUG_CATEGORY_STATIC (gst_rk3399facedetect_debug);
 #define GST_CAT_DEFAULT gst_rk3399facedetect_debug
@@ -275,17 +278,30 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   // DEBUG: Encode & save OpenCV Image
   // auto ret = imwrite("test.png", frame);
 
+  /* Face detect */
+  std::vector<FaceInfo> face_info;
+  auto detector_start = std::chrono::steady_clock::now();
+  face_detector[0].detect(frame, face_info);
+  auto detector_end = std::chrono::steady_clock::now();
+
+  // Draw
+  for (auto face : face_info) {
+      cv::Point pt1(face.x1, face.y1);
+      cv::Point pt2(face.x2, face.y2);
+      cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0), 2);
+  }
 
   gst_buffer_unmap (buf, &info);
   /* IMAGE PROCESSING CODE BLOCK END */
 
-  if (filter->silent == FALSE)
-    g_print ("I'm plugged, therefore I'm in.\n");
+  if (filter->silent == FALSE) {
+    std::chrono::duration<double> detect_time = detector_end - detector_start;
+    std::cout << "detect_time: " << detect_time.count() << " s" << std::endl;
+  }
 
   /* just push out the incoming buffer without touching it */
   return gst_pad_push (filter->srcpad, buf);
 }
-
 
 /* entry point to initialize the plug-in
  * initialize the plug-in itself
@@ -302,6 +318,17 @@ rk3399facedetect_init (GstPlugin * rk3399facedetect)
       0, "Template rk3399facedetect");
 
   // return GST_ELEMENT_REGISTER (rk3399facedetect, rk3399facedetect);
+
+
+  /* IMAGE PROCESSING CODE BLOCK BEGIN */
+
+  /* Init face detector */
+  std::string mnn_path = "/opt/model/RFB-320.mnn";
+
+  void *memory = malloc(sizeof(UltraFace));
+  face_detector = new (memory) UltraFace(mnn_path, 320, 240, 4, false, 0.65);
+
+  /* IMAGE PROCESSING CODE BLOCK END */
 
   return gst_element_register (rk3399facedetect, "rk3399facedetect", GST_RANK_NONE,
     GST_TYPE_RK3399FACEDETECT);
