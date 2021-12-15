@@ -1,3 +1,2 @@
-- Computer vision practice with ARM NEON, Mali GPU on RK3399 + Intel Myriad X
+- Computer vision practice with ARM NEON, Mali GPU on RK3399
 - Rock Pi 4: http://rockpi.org/rockpi4
-- Intel NCS2: https://www.intel.com/content/www/us/en/developer/tools/neural-compute-stick/overview.html
