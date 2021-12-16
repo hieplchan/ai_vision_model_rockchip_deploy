@@ -34,7 +34,7 @@ link_directories(
         /usr/lib/aarch64-linux-gnu/gstreamer-1.0
         ${GLIB_LIBRARY_DIRS}
         ${GSTREAMER_LIBRARY_DIRS}
-        ${GSTREAMER_BASE_LIBRARIES}
+        ${GSTREAMER_BASE_LIBRARY_DIRS}
         ${MNN_LIBRARY_DIRS}
 )
 
