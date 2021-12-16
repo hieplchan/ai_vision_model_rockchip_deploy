@@ -48,6 +48,7 @@
 #define __GST_RK3399FACEDETECT_H__
 
 #include <gst/gst.h>
+#include "gstinferdatameta.h"
 
 G_BEGIN_DECLS
 

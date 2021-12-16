@@ -27,12 +27,14 @@ include_directories(
         ${GSTREAMER_INCLUDE_DIRS}
         ${MNN_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../gst-libs 
 )
 
 link_directories(
+        /usr/lib/aarch64-linux-gnu/gstreamer-1.0
         ${GLIB_LIBRARY_DIRS}
         ${GSTREAMER_LIBRARY_DIRS}
-        ${GSTREAMER_BASE_INCLUDE_DIRS}
+        ${GSTREAMER_BASE_LIBRARIES}
         ${MNN_LIBRARY_DIRS}
 )
 
@@ -41,6 +43,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_link_libraries(${PROJECT_NAME}
         MNN
         MNN_CL
+        gstinferdatameta
         ${OpenCV_LIBS}
         ${GLIB2_LIBRARIES}
         ${GSTREAMER_LIBRARIES}

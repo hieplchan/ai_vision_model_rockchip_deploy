@@ -284,6 +284,12 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   face_detector[0].detect(frame, face_info);
   auto detector_end = std::chrono::steady_clock::now();
 
+  // Meta data
+  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_add_meta (buf, GST_BUFFER_INFO_META_INFO, NULL);
+  std::string label = "hiep dep trai";
+  gst_buffer_info_meta->info.description = (gchar*) malloc(label.length() + 1);
+  strcpy(gst_buffer_info_meta->info.description, label.c_str());
+
   // Draw
   for (auto face : face_info) {
       cv::Point pt1(face.x1, face.y1);
