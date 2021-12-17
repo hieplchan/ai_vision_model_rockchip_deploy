@@ -279,24 +279,29 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   // auto ret = imwrite("test.png", frame);
 
   /* Face detect */
-  std::vector<FaceInfo> face_info;
   auto detector_start = std::chrono::steady_clock::now();
+  std::vector<FaceInfo> face_info;
   face_detector[0].detect(frame, face_info);
-  auto detector_end = std::chrono::steady_clock::now();
 
   // Meta data
-  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_add_meta (buf, GST_BUFFER_INFO_META_INFO, NULL);
-  std::string label = "hiep dep trai";
-  gst_buffer_info_meta->info.description = (gchar*) malloc(label.length() + 1);
-  strcpy(gst_buffer_info_meta->info.description, label.c_str());
+  if (face_info.size() > 0){
+    GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_add_meta (buf, GST_BUFFER_INFO_META_INFO, NULL);
+    
+    gst_buffer_info_meta->num_boxes = face_info.size();
+    gst_buffer_info_meta->boxes = (GstBufferInfo *) malloc (sizeof(GstBufferInfo) * face_info.size());
 
-  // Draw
-  for (auto face : face_info) {
-      cv::Point pt1(face.x1, face.y1);
-      cv::Point pt2(face.x2, face.y2);
-      cv::rectangle(frame, pt1, pt2, cv::Scalar(0, 255, 0), 2);
+    for (size_t face_num = 0; face_num < face_info.size(); face_num++) {
+      gst_buffer_info_meta->boxes[face_num].x = face_info[face_num].x1;
+      gst_buffer_info_meta->boxes[face_num].y = face_info[face_num].y1;
+      gst_buffer_info_meta->boxes[face_num].width = face_info[face_num].x2 - face_info[face_num].x1;
+      gst_buffer_info_meta->boxes[face_num].height = face_info[face_num].y2 - face_info[face_num].y1;
+    }
   }
+  
+  auto detector_end = std::chrono::steady_clock::now();
 
+  frame.release();
+  
   gst_buffer_unmap (buf, &info);
   /* IMAGE PROCESSING CODE BLOCK END */
 
