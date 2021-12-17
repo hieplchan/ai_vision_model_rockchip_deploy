@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef _GST_RKBBOXDRAW_H_
-#define _GST_RKBBOXDRAW_H_
+#ifndef _GST_RKFACEDETECT_H_
+#define _GST_RKFACEDETECT_H_
 
 #include <gst/video/video.h>
 #include <gst/video/gstvideofilter.h>
@@ -27,29 +27,31 @@
 #include <opencv2/imgproc/imgproc_c.h>
 
 #include "gstinferdatameta.h"
+#include "UltraFace.hpp"
 
 G_BEGIN_DECLS
 
-#define GST_TYPE_RKBBOXDRAW   (gst_rkbboxdraw_get_type())
-#define GST_RKBBOXDRAW(obj)   (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_RKBBOXDRAW,GstRkbboxdraw))
-#define GST_RKBBOXDRAW_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_RKBBOXDRAW,GstRkbboxdrawClass))
-#define GST_IS_RKBBOXDRAW(obj)   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_RKBBOXDRAW))
-#define GST_IS_RKBBOXDRAW_CLASS(obj)   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_RKBBOXDRAW))
+#define GST_TYPE_RKFACEDETECT   (gst_rkfacedetect_get_type())
+#define GST_RKFACEDETECT(obj)   (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_RKFACEDETECT,GstRkfacedetect))
+#define GST_RKFACEDETECT_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_RKFACEDETECT,GstRkfacedetectClass))
+#define GST_IS_RKFACEDETECT(obj)   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_RKFACEDETECT))
+#define GST_IS_RKFACEDETECT_CLASS(obj)   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_RKFACEDETECT))
 
-typedef struct _GstRkbboxdraw GstRkbboxdraw;
-typedef struct _GstRkbboxdrawClass GstRkbboxdrawClass;
+typedef struct _GstRkfacedetect GstRkfacedetect;
+typedef struct _GstRkfacedetectClass GstRkfacedetectClass;
 
-struct _GstRkbboxdraw
+struct _GstRkfacedetect
 {
-  GstVideoFilter base_rkbboxdraw;
+  GstVideoFilter base_rkfacedetect;
+
 };
 
-struct _GstRkbboxdrawClass
+struct _GstRkfacedetectClass
 {
-  GstVideoFilterClass base_rkbboxdraw_class;
+  GstVideoFilterClass base_rkfacedetect_class;
 };
 
-GType gst_rkbboxdraw_get_type (void);
+GType gst_rkfacedetect_get_type (void);
 
 G_END_DECLS
 

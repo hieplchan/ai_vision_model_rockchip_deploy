@@ -46,6 +46,14 @@ gst-launch-1.0 rkv4l2src device=/dev/video4 \
 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB \
 ! rk3399facedetect width=1280 height=720 \
 ! autovideosink
+
+sudo cp libgstrkfacedetect.so  /usr/lib/aarch64-linux-gnu/gstreamer-1.0
+
+gst-launch-1.0 rkv4l2src device=/dev/video4 \
+! videoconvert ! video/x-raw,width=1280,height=720,format=RGB \
+! rkfacedetect \
+
+! autovideosink
 ```
 
 ## 3.3 Face Bounding Box draw
@@ -55,6 +63,12 @@ sudo cp libgstrkbboxdraw.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0/
 gst-launch-1.0 rkv4l2src device=/dev/video4 ! queue \
 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! queue \
 ! rk3399facedetect width=1280 height=720 ! queue \
+! rkbboxdraw ! queue \
+! autovideosink
+
+gst-launch-1.0 rkv4l2src device=/dev/video4 ! queue \
+! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! queue \
+! rkfacedetect ! queue \
 ! rkbboxdraw ! queue \
 ! autovideosink
 ```

@@ -226,7 +226,7 @@ gst_rkbboxdraw_transform_frame_ip (GstVideoFilter * filter, GstVideoFrame * fram
 
   /* IMAGE PROCESSING CODE BLOCK BEGIN */
   // Meta data
-  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta*)gst_buffer_get_meta((frame->buffer), GST_BUFFER_INFO_META_API_TYPE);
+  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_get_meta((frame->buffer), GST_BUFFER_INFO_META_API_TYPE);
 
   if (gst_buffer_info_meta == NULL) {
     // Do not have bbox to draw
@@ -280,4 +280,3 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     rkbboxdraw,
     "FIXME plugin description",
     plugin_init, VERSION, "LGPL", PACKAGE_NAME, GST_PACKAGE_ORIGIN)
-
