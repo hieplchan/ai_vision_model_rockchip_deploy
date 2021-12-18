@@ -1,5 +1,32 @@
-/* GStreamer
- * Copyright (C) 2021 FIXME <fixme@example.com>
+/*
+ * GStreamer
+ * Copyright (C) 2005 Thomas Vander Stichele <thomas@apestaart.org>
+ * Copyright (C) 2005 Ronald S. Bultje <rbultje@ronald.bitfreak.net>
+ * Copyright (C) 2020 Niels De Graef <niels.degraef@gmail.com>
+ * Copyright (C) 2021 rock <<user@hostname.org>>
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ * Alternatively, the contents of this file may be used under the
+ * GNU Lesser General Public License Version 2.1 (the "LGPL"), in
+ * which case the following provisions apply instead of the ones
+ * mentioned above:
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -13,46 +40,35 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
- * Boston, MA 02110-1301, USA.
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
 
-#ifndef _GST_RKFACEDETECT_H_
-#define _GST_RKFACEDETECT_H_
+#ifndef __GST_RK3399FACEDETECT_H__
+#define __GST_RK3399FACEDETECT_H__
 
-#include <gst/video/video.h>
-#include <gst/video/gstvideofilter.h>
-
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc_c.h>
-
+#include <gst/gst.h>
 #include "gstinferdatameta.h"
-#include "UltraFace.hpp"
 
 G_BEGIN_DECLS
 
-#define GST_TYPE_RKFACEDETECT   (gst_rkfacedetect_get_type())
-#define GST_RKFACEDETECT(obj)   (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_RKFACEDETECT,GstRkfacedetect))
-#define GST_RKFACEDETECT_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_RKFACEDETECT,GstRkfacedetectClass))
-#define GST_IS_RKFACEDETECT(obj)   (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_RKFACEDETECT))
-#define GST_IS_RKFACEDETECT_CLASS(obj)   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_RKFACEDETECT))
+#define GST_TYPE_RK3399FACEDETECT (gst_rk3399facedetect_get_type())
+G_DECLARE_FINAL_TYPE (Gstrk3399facedetect, gst_rk3399facedetect,
+    GST, RK3399FACEDETECT, GstElement)
 
-typedef struct _GstRkfacedetect GstRkfacedetect;
-typedef struct _GstRkfacedetectClass GstRkfacedetectClass;
-
-struct _GstRkfacedetect
+struct _Gstrk3399facedetect
 {
-  GstVideoFilter base_rkfacedetect;
+  GstElement element;
 
+  GstPad *sinkpad, *srcpad;
+
+  gboolean silent;
+  
+  glong width;
+
+  glong height;
 };
-
-struct _GstRkfacedetectClass
-{
-  GstVideoFilterClass base_rkfacedetect_class;
-};
-
-GType gst_rkfacedetect_get_type (void);
 
 G_END_DECLS
 
-#endif
+#endif /* __GST_RK3399FACEDETECT_H__ */

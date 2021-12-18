@@ -91,7 +91,6 @@ int UltraFace::detect(cv::Mat &raw_image, std::vector<FaceInfo> &face_list) {
 
     auto start = chrono::steady_clock::now();
 
-
     // run network
     ultraface_interpreter->runSession(ultraface_session);
 

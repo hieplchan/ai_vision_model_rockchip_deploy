@@ -16,7 +16,7 @@ sudo apt install -y wget git autoconf libtool automake build-essential libglib2.
 # 3. USB Camera
 ```
 sudo apt install -y gstreamer1.0-rockchip1* librockchip-* rockchip-mpp*
-gst-launch-1.0 rkv4l2src device=/dev/video4 ! videoconvert ! autovideosink
+gst-launch-1.0 rkv4l2src device=/dev/video4 ! videoconvert ! kmssink
 gst-launch-1.0 rkv4l2src device=/dev/video4 ! videoconvert ! jpegenc ! multifilesink location=image_%06d.jpg
 ```
 

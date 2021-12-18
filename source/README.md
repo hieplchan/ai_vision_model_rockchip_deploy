@@ -40,19 +40,11 @@ sudo cp libgstinferdatameta.so  /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
 ## 3.2 Face detect
 ```
-sudo cp libgstrk3399facedetect.so  /usr/lib/aarch64-linux-gnu/gstreamer-1.0
-
-gst-launch-1.0 rkv4l2src device=/dev/video4 \
-! videoconvert ! video/x-raw,width=1280,height=720,format=RGB \
-! rk3399facedetect width=1280 height=720 \
-! autovideosink
-
 sudo cp libgstrkfacedetect.so  /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
 gst-launch-1.0 rkv4l2src device=/dev/video4 \
 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB \
-! rkfacedetect \
-
+! rkfacedetect width=1280 height=720 \
 ! autovideosink
 ```
 
@@ -62,13 +54,7 @@ sudo cp libgstrkbboxdraw.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0/
 
 gst-launch-1.0 rkv4l2src device=/dev/video4 ! queue \
 ! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! queue \
-! rk3399facedetect width=1280 height=720 ! queue \
+! rkfacedetect width=1280 height=720 ! queue \
 ! rkbboxdraw ! queue \
-! autovideosink
-
-gst-launch-1.0 rkv4l2src device=/dev/video4 ! queue \
-! videoconvert ! video/x-raw,width=1280,height=720,format=RGB ! queue \
-! rkfacedetect ! queue \
-! rkbboxdraw ! queue \
-! autovideosink
+! kmssink
 ```
