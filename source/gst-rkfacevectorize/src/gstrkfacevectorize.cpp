@@ -44,14 +44,14 @@
  */
 
 /**
- * SECTION:element-rk3399facedetect
+ * SECTION:element-rkfacevectorize
  *
- * FIXME:Describe rk3399facedetect here.
+ * FIXME:Describe rkfacevectorize here.
  *
  * <refsect2>
  * <title>Example launch line</title>
  * |[
- * gst-launch -v -m fakesrc ! rk3399facedetect ! fakesink silent=TRUE
+ * gst-launch -v -m fakesrc ! rkfacevectorize ! fakesink silent=TRUE
  * ]|
  * </refsect2>
  */
@@ -60,12 +60,12 @@
 #  include <config.h>
 #endif
 
-#include "gstrkfacedetect.h"
+#include <gst/gst.h>
 
-UltraFace *face_detector;
+#include "gstrkfacevectorize.h"
 
-GST_DEBUG_CATEGORY_STATIC (gst_rk3399facedetect_debug);
-#define GST_CAT_DEFAULT gst_rk3399facedetect_debug
+GST_DEBUG_CATEGORY_STATIC (gst_rkfacevectorize_debug);
+#define GST_CAT_DEFAULT gst_rkfacevectorize_debug
 
 /* Filter signals and args */
 enum
@@ -98,27 +98,27 @@ static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE ("src",
     GST_STATIC_CAPS ("ANY")
     );
 
-#define gst_rk3399facedetect_parent_class parent_class
-G_DEFINE_TYPE (Gstrk3399facedetect, gst_rk3399facedetect, GST_TYPE_ELEMENT);
+#define gst_rkfacevectorize_parent_class parent_class
+G_DEFINE_TYPE (Gstrkfacevectorize, gst_rkfacevectorize, GST_TYPE_ELEMENT);
 
-// GST_ELEMENT_REGISTER_DEFINE (rk3399facedetect, "rk3399facedetect", GST_RANK_NONE,
-//     GST_TYPE_RK3399FACEDETECT);
+// GST_ELEMENT_REGISTER_DEFINE (rkfacevectorize, "rkfacevectorize", GST_RANK_NONE,
+//     GST_TYPE_RKFACEVECTORIZE);
 
-static void gst_rk3399facedetect_set_property (GObject * object,
+static void gst_rkfacevectorize_set_property (GObject * object,
     guint prop_id, const GValue * value, GParamSpec * pspec);
-static void gst_rk3399facedetect_get_property (GObject * object,
+static void gst_rkfacevectorize_get_property (GObject * object,
     guint prop_id, GValue * value, GParamSpec * pspec);
 
-static gboolean gst_rk3399facedetect_sink_event (GstPad * pad,
+static gboolean gst_rkfacevectorize_sink_event (GstPad * pad,
     GstObject * parent, GstEvent * event);
-static GstFlowReturn gst_rk3399facedetect_chain (GstPad * pad,
+static GstFlowReturn gst_rkfacevectorize_chain (GstPad * pad,
     GstObject * parent, GstBuffer * buf);
 
 /* GObject vmethod implementations */
 
-/* initialize the rk3399facedetect's class */
+/* initialize the rkfacevectorize's class */
 static void
-gst_rk3399facedetect_class_init (Gstrk3399facedetectClass * klass)
+gst_rkfacevectorize_class_init (GstrkfacevectorizeClass * klass)
 {
   GObjectClass *gobject_class;
   GstElementClass *gstelement_class;
@@ -126,8 +126,8 @@ gst_rk3399facedetect_class_init (Gstrk3399facedetectClass * klass)
   gobject_class = (GObjectClass *) klass;
   gstelement_class = (GstElementClass *) klass;
 
-  gobject_class->set_property = gst_rk3399facedetect_set_property;
-  gobject_class->get_property = gst_rk3399facedetect_get_property;
+  gobject_class->set_property = gst_rkfacevectorize_set_property;
+  gobject_class->get_property = gst_rkfacevectorize_get_property;
 
   g_object_class_install_property (gobject_class, PROP_SILENT,
       g_param_spec_boolean ("silent", "Silent", "Produce verbose output ?",
@@ -142,7 +142,7 @@ gst_rk3399facedetect_class_init (Gstrk3399facedetectClass * klass)
           0, 4000, 1080, G_PARAM_READWRITE));
 
   gst_element_class_set_details_simple (gstelement_class,
-      "rk3399facedetect",
+      "rkfacevectorize",
       "FIXME:Generic",
       "FIXME:Generic Template Element", "rock <<user@hostname.org>>");
 
@@ -158,13 +158,13 @@ gst_rk3399facedetect_class_init (Gstrk3399facedetectClass * klass)
  * initialize instance structure
  */
 static void
-gst_rk3399facedetect_init (Gstrk3399facedetect * filter)
+gst_rkfacevectorize_init (Gstrkfacevectorize * filter)
 {
   filter->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
   gst_pad_set_event_function (filter->sinkpad,
-      GST_DEBUG_FUNCPTR (gst_rk3399facedetect_sink_event));
+      GST_DEBUG_FUNCPTR (gst_rkfacevectorize_sink_event));
   gst_pad_set_chain_function (filter->sinkpad,
-      GST_DEBUG_FUNCPTR (gst_rk3399facedetect_chain));
+      GST_DEBUG_FUNCPTR (gst_rkfacevectorize_chain));
   GST_PAD_SET_PROXY_CAPS (filter->sinkpad);
   gst_element_add_pad (GST_ELEMENT (filter), filter->sinkpad);
 
@@ -176,10 +176,10 @@ gst_rk3399facedetect_init (Gstrk3399facedetect * filter)
 }
 
 static void
-gst_rk3399facedetect_set_property (GObject * object, guint prop_id,
+gst_rkfacevectorize_set_property (GObject * object, guint prop_id,
     const GValue * value, GParamSpec * pspec)
 {
-  Gstrk3399facedetect *filter = GST_RK3399FACEDETECT (object);
+  Gstrkfacevectorize *filter = GST_RKFACEVECTORIZE (object);
 
   switch (prop_id) {
     case PROP_SILENT:
@@ -198,10 +198,10 @@ gst_rk3399facedetect_set_property (GObject * object, guint prop_id,
 }
 
 static void
-gst_rk3399facedetect_get_property (GObject * object, guint prop_id,
+gst_rkfacevectorize_get_property (GObject * object, guint prop_id,
     GValue * value, GParamSpec * pspec)
 {
-  Gstrk3399facedetect *filter = GST_RK3399FACEDETECT (object);
+  Gstrkfacevectorize *filter = GST_RKFACEVECTORIZE (object);
 
   switch (prop_id) {
     case PROP_SILENT:
@@ -223,13 +223,13 @@ gst_rk3399facedetect_get_property (GObject * object, guint prop_id,
 
 /* this function handles sink events */
 static gboolean
-gst_rk3399facedetect_sink_event (GstPad * pad, GstObject * parent,
+gst_rkfacevectorize_sink_event (GstPad * pad, GstObject * parent,
     GstEvent * event)
 {
-  Gstrk3399facedetect *filter;
+  Gstrkfacevectorize *filter;
   gboolean ret;
 
-  filter = GST_RK3399FACEDETECT (parent);
+  filter = GST_RKFACEVECTORIZE (parent);
 
   GST_LOG_OBJECT (filter, "Received %s event: %" GST_PTR_FORMAT,
       GST_EVENT_TYPE_NAME (event), event);
@@ -257,11 +257,11 @@ gst_rk3399facedetect_sink_event (GstPad * pad, GstObject * parent,
  * this function does the actual processing
  */
 static GstFlowReturn
-gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
+gst_rkfacevectorize_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
 {
-  Gstrk3399facedetect *filter;
+  Gstrkfacevectorize *filter;
 
-  filter = GST_RK3399FACEDETECT (parent);
+  filter = GST_RKFACEVECTORIZE (parent);
 
   /* IMAGE PROCESSING CODE BLOCK BEGIN */
   GstMapInfo info;
@@ -272,27 +272,10 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   // DEBUG: Encode & save OpenCV Image
   // auto ret = imwrite("test.png", frame);
 
-  /* Face detect */
-  auto detector_start = std::chrono::steady_clock::now();
-  std::vector<FaceInfo> face_info;
-  face_detector[0].detect(frame, face_info);
+  auto vectorize_start = std::chrono::steady_clock::now();
 
-  // Meta data
-  if (face_info.size() > 0){
-    GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_add_meta (buf, GST_BUFFER_INFO_META_INFO, NULL);
-    
-    gst_buffer_info_meta->num_boxes = face_info.size();
-    gst_buffer_info_meta->boxes = (GstBufferInfo *) malloc (sizeof(GstBufferInfo) * face_info.size());
 
-    for (size_t face_num = 0; face_num < face_info.size(); face_num++) {
-      gst_buffer_info_meta->boxes[face_num].x = face_info[face_num].x1;
-      gst_buffer_info_meta->boxes[face_num].y = face_info[face_num].y1;
-      gst_buffer_info_meta->boxes[face_num].width = face_info[face_num].x2 - face_info[face_num].x1;
-      gst_buffer_info_meta->boxes[face_num].height = face_info[face_num].y2 - face_info[face_num].y1;
-    }
-  }
-  
-  auto detector_end = std::chrono::steady_clock::now();
+  auto vectorize_end = std::chrono::steady_clock::now();
 
   frame.release();
   
@@ -300,46 +283,33 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   /* IMAGE PROCESSING CODE BLOCK END */
 
   if (filter->silent == FALSE) {
-    std::chrono::duration<double> detect_time = detector_end - detector_start;
-    std::cout << "detect_time: " << detect_time.count() << " s" << std::endl;
+    std::chrono::duration<double> vectorize_time = vectorize_end - vectorize_start;
+    std::cout << "vectorize_time: " << vectorize_time.count() << " s" << std::endl;    
   }
 
   /* just push out the incoming buffer without touching it */
   return gst_pad_push (filter->srcpad, buf);
 }
 
+
 /* entry point to initialize the plug-in
  * initialize the plug-in itself
  * register the element factories and other features
  */
 static gboolean
-rkfacedetect_init (GstPlugin * rkfacedetect)
+rkfacevectorize_init (GstPlugin * rkfacevectorize)
 {
   /* debug category for filtering log messages
    *
-   * exchange the string 'Template rk3399facedetect' with your description
+   * exchange the string 'Template rkfacevectorize' with your description
    */
-  GST_DEBUG_CATEGORY_INIT (gst_rk3399facedetect_debug, "rk3399facedetect",
-      0, "Template rk3399facedetect");
+  GST_DEBUG_CATEGORY_INIT (gst_rkfacevectorize_debug, "rkfacevectorize",
+      0, "Template rkfacevectorize");
 
-  // return GST_ELEMENT_REGISTER (rk3399facedetect, rk3399facedetect);
+  // return GST_ELEMENT_REGISTER (rkfacevectorize, rkfacevectorize);
 
-
-  /* IMAGE PROCESSING CODE BLOCK BEGIN */
-
-  /* Init face detector */
-  std::cout << "Start loading model" << std::endl;
-
-  std::string mnn_path = "/opt/model/RFB-320.mnn";
-  void *memory = malloc(sizeof(UltraFace));
-  face_detector = new (memory) UltraFace(mnn_path, 320, 240, 4, false, 0.65); // CPU mode
-  // face_detector = new (memory) UltraFace(mnn_path, 320, 240, 4, true, 0.65); // GPU mode
-
-  std::cout << "Loaded model" << std::endl;
-  /* IMAGE PROCESSING CODE BLOCK END */
-
-  return gst_element_register (rkfacedetect, "rkfacedetect", GST_RANK_NONE,
-    GST_TYPE_RK3399FACEDETECT);
+  return gst_element_register (rkfacevectorize, "rkfacevectorize", GST_RANK_NONE,
+    GST_TYPE_RKFACEVECTORIZE);
 }
 
 /* PACKAGE: this is usually set by meson depending on some _INIT macro
@@ -348,16 +318,16 @@ rkfacedetect_init (GstPlugin * rkfacedetect)
  * compile this code. GST_PLUGIN_DEFINE needs PACKAGE to be defined.
  */
 #ifndef PACKAGE
-#define PACKAGE "myfirstrk3399facedetect"
+#define PACKAGE "myfirstrkfacevectorize"
 #endif
 
-/* gstreamer looks for this structure to register rk3399facedetects
+/* gstreamer looks for this structure to register rkfacevectorizes
  *
- * exchange the string 'Template rk3399facedetect' with your rk3399facedetect description
+ * exchange the string 'Template rkfacevectorize' with your rkfacevectorize description
  */
 GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     GST_VERSION_MINOR,
-    rkfacedetect,
-    "rkfacedetect",
-    rkfacedetect_init,
+    rkfacevectorize,
+    "rkfacevectorize",
+    rkfacevectorize_init,
     PACKAGE_VERSION, GST_LICENSE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)

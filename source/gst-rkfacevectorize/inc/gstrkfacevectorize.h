@@ -44,8 +44,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __GST_RK3399FACEDETECT_H__
-#define __GST_RK3399FACEDETECT_H__
+#ifndef __GST_RKFACEVECTORIZE_H__
+#define __GST_RKFACEVECTORIZE_H__
 
 #include <gst/gst.h>
 
@@ -53,22 +53,21 @@
 #include <opencv2/imgproc/imgproc_c.h>
 
 #include "gstinferdatameta.h"
-#include "UltraFace.hpp"
 
 G_BEGIN_DECLS
 
-#define GST_TYPE_RK3399FACEDETECT (gst_rk3399facedetect_get_type())
-G_DECLARE_FINAL_TYPE (Gstrk3399facedetect, gst_rk3399facedetect,
-    GST, RK3399FACEDETECT, GstElement)
+#define GST_TYPE_RKFACEVECTORIZE (gst_rkfacevectorize_get_type())
+G_DECLARE_FINAL_TYPE (Gstrkfacevectorize, gst_rkfacevectorize,
+    GST, RKFACEVECTORIZE, GstElement)
 
-struct _Gstrk3399facedetect
+struct _Gstrkfacevectorize
 {
   GstElement element;
 
   GstPad *sinkpad, *srcpad;
 
   gboolean silent;
-  
+
   glong width;
 
   glong height;
@@ -76,4 +75,4 @@ struct _Gstrk3399facedetect
 
 G_END_DECLS
 
-#endif /* __GST_RK3399FACEDETECT_H__ */
+#endif /* __GST_RKFACEVECTORIZE_H__ */
