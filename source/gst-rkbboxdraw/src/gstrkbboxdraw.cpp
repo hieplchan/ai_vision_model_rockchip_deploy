@@ -233,6 +233,8 @@ gst_rkbboxdraw_transform_frame_ip (GstVideoFilter * filter, GstVideoFrame * fram
     return GST_FLOW_OK;
   }
 
+  auto detector_start = std::chrono::steady_clock::now();
+
   cv::Mat img(GST_VIDEO_FRAME_HEIGHT(frame), GST_VIDEO_FRAME_WIDTH(frame), CV_8UC3, GST_VIDEO_FRAME_PLANE_DATA(frame, 0));
 
   for (size_t face_num = 0; face_num < gst_buffer_info_meta->num_boxes; face_num++) {
@@ -242,9 +244,12 @@ gst_rkbboxdraw_transform_frame_ip (GstVideoFilter * filter, GstVideoFrame * fram
     cv::rectangle(img, pt1, pt2, cv::Scalar(0, 255, 0), 2);
   }
 
+  auto detector_end = std::chrono::steady_clock::now();
+
   img.release();
   /* IMAGE PROCESSING CODE BLOCK END */
-
+  std::chrono::duration<double> detect_time = detector_end - detector_start;
+  std::cout << "bbox_time: " << detect_time.count() << " s" << std::endl;
   return GST_FLOW_OK;
 }
 

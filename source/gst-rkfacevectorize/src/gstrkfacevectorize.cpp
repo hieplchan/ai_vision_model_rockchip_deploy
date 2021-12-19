@@ -64,6 +64,9 @@
 
 #include "gstrkfacevectorize.h"
 
+InsightFace *face_vectorizer = nullptr;
+gboolean using_gpu = false;
+
 GST_DEBUG_CATEGORY_STATIC (gst_rkfacevectorize_debug);
 #define GST_CAT_DEFAULT gst_rkfacevectorize_debug
 
@@ -79,7 +82,8 @@ enum
   PROP_0,
   PROP_SILENT,
   PROP_WIDTH,
-  PROP_HEIGHT
+  PROP_HEIGHT,
+  PROP_USING_GPU
 };
 
 /* the capabilities of the inputs and outputs.
@@ -141,6 +145,10 @@ gst_rkfacevectorize_class_init (GstrkfacevectorizeClass * klass)
       g_param_spec_long("height", "Height", "Input video height (pixel)",
           0, 4000, 1080, G_PARAM_READWRITE));
 
+  g_object_class_install_property (gobject_class, PROP_USING_GPU,
+      g_param_spec_boolean ("using_gpu", "Using GPU", "Using GPU backend if true, using CPU if false",
+          FALSE, G_PARAM_READWRITE));
+
   gst_element_class_set_details_simple (gstelement_class,
       "rkfacevectorize",
       "FIXME:Generic",
@@ -191,6 +199,9 @@ gst_rkfacevectorize_set_property (GObject * object, guint prop_id,
     case PROP_HEIGHT:
       filter->height = g_value_get_long (value);
       break;
+    case PROP_USING_GPU:
+      filter->using_gpu = g_value_get_boolean (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -212,6 +223,10 @@ gst_rkfacevectorize_get_property (GObject * object, guint prop_id,
       break;
     case PROP_HEIGHT:
       g_value_set_long (value, filter->height);
+      break;
+    case PROP_USING_GPU:
+      g_value_set_boolean (value, filter->using_gpu);
+      using_gpu = g_value_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -267,24 +282,41 @@ gst_rkfacevectorize_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   GstMapInfo info;
   gst_buffer_map (buf, &info, GST_MAP_READ);
 
-  cv::Mat frame = cv::Mat(cvSize(filter->width, filter->height), CV_8UC3, info.data, cv::Mat::AUTO_STEP);
-
-  // DEBUG: Encode & save OpenCV Image
-  // auto ret = imwrite("test.png", frame);
-
+  // Meta data
+  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_get_meta(buf, GST_BUFFER_INFO_META_API_TYPE);
   auto vectorize_start = std::chrono::steady_clock::now();
+ 
+  if (gst_buffer_info_meta != NULL) {
+    cv::Mat frame = cv::Mat(cvSize(filter->width, filter->height), CV_8UC3, info.data, cv::Mat::AUTO_STEP);
 
+    // DEBUG: Encode & save OpenCV Image
+    // auto ret = imwrite("test.png", frame);
 
-  auto vectorize_end = std::chrono::steady_clock::now();
+    for (size_t face_num = 0; face_num < gst_buffer_info_meta->num_boxes; face_num++) {
+      cv::Rect roi;
+      roi.x = gst_buffer_info_meta->boxes[face_num].x;
+      roi.y = gst_buffer_info_meta->boxes[face_num].y;
+      roi.width = gst_buffer_info_meta->boxes[face_num].width;
+      roi.height = gst_buffer_info_meta->boxes[face_num].height;
 
-  frame.release();
+      cv::Mat crop = frame(roi);
+      face_vectorizer->vectorize(crop, (float *) gst_buffer_info_meta->boxes[face_num].embedding);
+
+      crop.release();
+    }
+
+    frame.release();
+
+    // std::cout << "face_vectors.size(): " << face_vectors.size() << std::endl;
+  }
   
+  auto vectorize_end = std::chrono::steady_clock::now();
   gst_buffer_unmap (buf, &info);
   /* IMAGE PROCESSING CODE BLOCK END */
 
   if (filter->silent == FALSE) {
     std::chrono::duration<double> vectorize_time = vectorize_end - vectorize_start;
-    std::cout << "vectorize_time: " << vectorize_time.count() << " s" << std::endl;    
+    std::cout << "vector_time: " << vectorize_time.count() << " s" << std::endl;
   }
 
   /* just push out the incoming buffer without touching it */
@@ -307,6 +339,22 @@ rkfacevectorize_init (GstPlugin * rkfacevectorize)
       0, "Template rkfacevectorize");
 
   // return GST_ELEMENT_REGISTER (rkfacevectorize, rkfacevectorize);
+
+  if (face_vectorizer == nullptr) {
+    /* Init face vectorizer */
+    std::string mnn_path = "/opt/model/w600k_mbf.mnn";
+
+    void *memory = malloc(sizeof(InsightFace));
+    if (using_gpu) {
+      std::cout << "Start loading model using GPU: " << mnn_path << std::endl;
+      face_vectorizer = new (memory) InsightFace(mnn_path, 4, false); // CPU mode
+    } else {
+      std::cout << "Start loading model using CPU: " << mnn_path << std::endl;
+      face_vectorizer = new (memory) InsightFace(mnn_path, 1, true); // GPU mode
+    }
+
+    std::cout << "Loaded model: " << mnn_path << std::endl;
+  }
 
   return gst_element_register (rkfacevectorize, "rkfacevectorize", GST_RANK_NONE,
     GST_TYPE_RKFACEVECTORIZE);

@@ -62,7 +62,8 @@
 
 #include "gstrkfacedetect.h"
 
-UltraFace *face_detector;
+UltraFace *face_detector = nullptr;
+gboolean using_gpu = false;
 
 GST_DEBUG_CATEGORY_STATIC (gst_rk3399facedetect_debug);
 #define GST_CAT_DEFAULT gst_rk3399facedetect_debug
@@ -79,7 +80,8 @@ enum
   PROP_0,
   PROP_SILENT,
   PROP_WIDTH,
-  PROP_HEIGHT
+  PROP_HEIGHT,
+  PROP_USING_GPU
 };
 
 /* the capabilities of the inputs and outputs.
@@ -141,6 +143,10 @@ gst_rk3399facedetect_class_init (Gstrk3399facedetectClass * klass)
       g_param_spec_long("height", "Height", "Input video height (pixel)",
           0, 4000, 1080, G_PARAM_READWRITE));
 
+  g_object_class_install_property (gobject_class, PROP_USING_GPU,
+      g_param_spec_boolean ("using_gpu", "Using GPU", "Using GPU backend if true, using CPU if false",
+          FALSE, G_PARAM_READWRITE));
+
   gst_element_class_set_details_simple (gstelement_class,
       "rk3399facedetect",
       "FIXME:Generic",
@@ -191,6 +197,9 @@ gst_rk3399facedetect_set_property (GObject * object, guint prop_id,
     case PROP_HEIGHT:
       filter->height = g_value_get_long (value);
       break;
+    case PROP_USING_GPU:
+      filter->using_gpu = g_value_get_boolean (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -212,6 +221,10 @@ gst_rk3399facedetect_get_property (GObject * object, guint prop_id,
       break;
     case PROP_HEIGHT:
       g_value_set_long (value, filter->height);
+      break;
+    case PROP_USING_GPU:
+      g_value_set_boolean (value, filter->using_gpu);
+      using_gpu = g_value_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -264,6 +277,23 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   filter = GST_RK3399FACEDETECT (parent);
 
   /* IMAGE PROCESSING CODE BLOCK BEGIN */
+  if (face_detector == nullptr) {
+    /* Init face detector */
+    std::string mnn_path = "/opt/model/RFB-320.mnn";
+    // std::string mnn_path = "/opt/model/slim-320.mnn";
+
+    void *memory = malloc(sizeof(UltraFace));
+    if (filter->using_gpu) {
+      std::cout << "Start loading model using GPU: " << mnn_path << std::endl;
+      face_detector = new (memory) UltraFace(mnn_path, 320, 240, 1, true, 0.65); // GPU mode
+    } else {
+      std::cout << "Start loading model using CPU: " << mnn_path << std::endl;
+      face_detector = new (memory) UltraFace(mnn_path, 240, 240, 2, false, 0.65); // CPU mode
+    }
+
+    std::cout << "Loaded model: " << mnn_path << std::endl;
+  }
+
   GstMapInfo info;
   gst_buffer_map (buf, &info, GST_MAP_READ);
 
@@ -275,7 +305,7 @@ gst_rk3399facedetect_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   /* Face detect */
   auto detector_start = std::chrono::steady_clock::now();
   std::vector<FaceInfo> face_info;
-  face_detector[0].detect(frame, face_info);
+  face_detector->detect(frame, face_info);
 
   // Meta data
   if (face_info.size() > 0){
@@ -323,20 +353,6 @@ rkfacedetect_init (GstPlugin * rkfacedetect)
       0, "Template rk3399facedetect");
 
   // return GST_ELEMENT_REGISTER (rk3399facedetect, rk3399facedetect);
-
-
-  /* IMAGE PROCESSING CODE BLOCK BEGIN */
-
-  /* Init face detector */
-  std::cout << "Start loading model" << std::endl;
-
-  std::string mnn_path = "/opt/model/RFB-320.mnn";
-  void *memory = malloc(sizeof(UltraFace));
-  face_detector = new (memory) UltraFace(mnn_path, 320, 240, 4, false, 0.65); // CPU mode
-  // face_detector = new (memory) UltraFace(mnn_path, 320, 240, 4, true, 0.65); // GPU mode
-
-  std::cout << "Loaded model" << std::endl;
-  /* IMAGE PROCESSING CODE BLOCK END */
 
   return gst_element_register (rkfacedetect, "rkfacedetect", GST_RANK_NONE,
     GST_TYPE_RK3399FACEDETECT);

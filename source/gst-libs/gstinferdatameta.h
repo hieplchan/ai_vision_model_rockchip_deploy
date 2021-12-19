@@ -15,18 +15,19 @@ typedef enum {
  
 #define GST_BUFFER_INFO_META_API_TYPE (gst_buffer_info_meta_api_get_type())
 #define GST_BUFFER_INFO_META_INFO     (gst_buffer_info_meta_get_info())
+
+#define FACE_VECTOR_LENGTH 512
  
 typedef struct _GstBufferInfoMeta  GstBufferInfoMeta;
 typedef struct _GstBufferInfo      GstBufferInfo    ;
 
 struct _GstBufferInfo {
-    gchar* label;
-    gdouble x;
-    gdouble y;
-    gdouble width;
-    gdouble height;
-    gint num_embedding;
-    gdouble *embedding;
+    gchar label;
+    gfloat x;
+    gfloat y;
+    gfloat width;
+    gfloat height;
+    gfloat embedding[FACE_VECTOR_LENGTH];
 };
 
 struct _GstBufferInfoMeta {

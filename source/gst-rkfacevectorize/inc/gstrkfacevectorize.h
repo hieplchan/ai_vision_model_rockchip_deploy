@@ -53,6 +53,7 @@
 #include <opencv2/imgproc/imgproc_c.h>
 
 #include "gstinferdatameta.h"
+#include "InsightFace.hpp"
 
 G_BEGIN_DECLS
 
@@ -71,6 +72,8 @@ struct _Gstrkfacevectorize
   glong width;
 
   glong height;
+
+  gboolean using_gpu;
 };
 
 G_END_DECLS

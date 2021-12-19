@@ -72,6 +72,8 @@ struct _Gstrk3399facedetect
   glong width;
 
   glong height;
+
+  gboolean using_gpu;
 };
 
 G_END_DECLS
