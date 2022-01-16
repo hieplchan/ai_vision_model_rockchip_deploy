@@ -47,7 +47,11 @@
 #ifndef __GST_RKFACEENROLL_H__
 #define __GST_RKFACEENROLL_H__
 
+#include <iostream>
+
 #include <gst/gst.h>
+
+#include "gstinferdatameta.h"
 
 G_BEGIN_DECLS
 
@@ -62,6 +66,10 @@ struct _Gstrkfaceenroll
   GstPad *sinkpad, *srcpad;
 
   gboolean silent;
+
+  const gchar *file_path;
+
+  const gchar *user_name;
 };
 
 G_END_DECLS

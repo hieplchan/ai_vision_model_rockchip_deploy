@@ -75,7 +75,16 @@ make -j 6
 sudo cp libgstrkfacevectorize.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 ```
 
-## 3.4 Face Bounding Box draw
+## 3.4 Face enroll new user
+```
+mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfaceenroll/build
+cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfaceenroll/build
+cmake ..
+make -j 6
+sudo cp libgstrkfaceenroll.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
+```
+
+## 3.5 Face Bounding Box draw
 ```
 mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkbboxdraw/build
 cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkbboxdraw/build
@@ -84,7 +93,18 @@ make -j 6
 sudo cp libgstrkbboxdraw.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0/
 ```
 
-## 3.4 Full flow test
+## 3.6 Full flow test
+- Enroll new users
+```
+gst-launch-1.0 rkv4l2src device=/dev/video4 ! video/x-raw,width=640,height=480,framerate=10/1 \
+! videoconvert ! video/x-raw,width=640,height=480,format=RGB ! queue \
+! rkfacedetect width=640 height=480 using_gpu=false silent=true \
+! tee name=videoTee \
+    videoTee.src_0 ! queue ! rkbboxdraw ! kmssink \
+    videoTee.src_1 ! queue ! rkfacevectorize width=640 height=480 using_gpu=false silent=true \
+                   ! queue ! rkfaceenroll file_path="./test_user" user_name="hiep" \
+                   ! fakesink
+```
 - Live debug video
 ```
 gst-launch-1.0 rkv4l2src device=/dev/video4 ! video/x-raw,width=640,height=480,framerate=10/1 \

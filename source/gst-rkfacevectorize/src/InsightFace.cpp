@@ -65,6 +65,8 @@ int InsightFace::vectorize(cv::Mat &raw_image, float *face_vector) {
     chrono::duration<double> elapsed = end - start;
     // cout << "inference vectorizer time:" << elapsed.count() << " s" << endl;
 
+    std::cout << "[Debug] Insightface tensor_vector_host.host<float>()[0]: " << tensor_vector_host.host<float>()[0] << std::endl;
+
     for (size_t i = 0; i < FACE_VECTOR_LENGTH; i++) {
         face_vector[i] = tensor_vector_host.host<float>()[i];
     }
@@ -72,6 +74,8 @@ int InsightFace::vectorize(cv::Mat &raw_image, float *face_vector) {
     // Normalize vector
     cv::Mat vector = cv::Mat(1, FACE_VECTOR_LENGTH, CV_32F, face_vector);
     cv::normalize(vector, vector);
+
+    std::cout << "[Debug] Insightface face_vector[0]: " << face_vector[0] << std::endl;
 
     return 0;
 }

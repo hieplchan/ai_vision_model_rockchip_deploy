@@ -77,7 +77,9 @@ enum
 enum
 {
   PROP_0,
-  PROP_SILENT
+  PROP_SILENT,
+  PROP_FILE_PATH,
+  PROP_USER_NAME
 };
 
 /* the capabilities of the inputs and outputs.
@@ -130,6 +132,14 @@ gst_rkfaceenroll_class_init (GstrkfaceenrollClass * klass)
   g_object_class_install_property (gobject_class, PROP_SILENT,
       g_param_spec_boolean ("silent", "Silent", "Produce verbose output ?",
           FALSE, G_PARAM_READWRITE));
+  
+  g_object_class_install_property (gobject_class, PROP_FILE_PATH,
+    g_param_spec_string ("file_path", "File Path", "Path to database file",
+        "", G_PARAM_READWRITE));
+
+  g_object_class_install_property (gobject_class, PROP_USER_NAME,
+    g_param_spec_string ("user_name", "User Name", "New user name to enroll",
+        "", G_PARAM_READWRITE));
 
   gst_element_class_set_details_simple (gstelement_class,
       "rkfaceenroll",
@@ -175,6 +185,12 @@ gst_rkfaceenroll_set_property (GObject * object, guint prop_id,
     case PROP_SILENT:
       filter->silent = g_value_get_boolean (value);
       break;
+    case PROP_FILE_PATH:
+      filter->file_path = g_value_get_string (value);
+      break;
+    case PROP_USER_NAME:
+      filter->user_name = g_value_get_string (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -190,6 +206,12 @@ gst_rkfaceenroll_get_property (GObject * object, guint prop_id,
   switch (prop_id) {
     case PROP_SILENT:
       g_value_set_boolean (value, filter->silent);
+      break;
+    case PROP_FILE_PATH:
+      g_value_set_string (value, filter->file_path);
+      break;
+    case PROP_USER_NAME:
+      g_value_set_string (value, filter->user_name);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -241,8 +263,22 @@ gst_rkfaceenroll_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
 
   filter = GST_RKFACEENROLL (parent);
 
-  if (filter->silent == FALSE)
-    g_print ("I'm plugged, therefore I'm in.\n");
+  /* IMAGE PROCESSING CODE BLOCK BEGIN */
+  GstMapInfo info;
+  gst_buffer_map (buf, &info, GST_MAP_READ);
+  
+  // Meta data
+  GstBufferInfoMeta* gst_buffer_info_meta = (GstBufferInfoMeta *) gst_buffer_get_meta(buf, GST_BUFFER_INFO_META_API_TYPE);
+
+  if (gst_buffer_info_meta != NULL) {
+    std::cout << "[Debug] Enroll boxes[0].embedding[0]: " << gst_buffer_info_meta->boxes[0].embedding[0] << std::endl;
+  }
+
+  /* IMAGE PROCESSING CODE BLOCK END */
+
+  if (filter->silent == FALSE) {
+    g_print ("Enroll new user %s to database\n", filter->user_name);
+  }
 
   /* just push out the incoming buffer without touching it */
   return gst_pad_push (filter->srcpad, buf);

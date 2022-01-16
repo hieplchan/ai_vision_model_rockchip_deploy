@@ -308,6 +308,7 @@ gst_rkfacevectorize_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
     frame.release();
 
     // std::cout << "face_vectors.size(): " << face_vectors.size() << std::endl;
+    std::cout << "[Debug] Vectorize boxes[0].embedding[0]: " << gst_buffer_info_meta->boxes[0].embedding[0] << std::endl;
   }
   
   auto vectorize_end = std::chrono::steady_clock::now();
