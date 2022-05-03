@@ -43,8 +43,8 @@ gst-launch-1.0 rkv4l2src device=/dev/video4 ! video/x-raw,width=640,height=480,f
 
 ## 3.1 Infer meta data
 ```
-mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-libs/build
-cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-libs/build
+mkdir -p ~/ai_vision_model_rockchip_deploy/source/gst-libs/build
+cd ~/ai_vision_model_rockchip_deploy/source/gst-libs/build
 cmake ..
 make -j 6
 sudo cp libgstinferdatameta.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
@@ -52,8 +52,8 @@ sudo cp libgstinferdatameta.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
 ## 3.2 Face detect
 ```
-mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfacedetect/build
-cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfacedetect/build
+mkdir -p ~/ai_vision_model_rockchip_deploy/source/gst-rkfacedetect/build
+cd ~/ai_vision_model_rockchip_deploy/source/gst-rkfacedetect/build
 cmake ..
 make -j 6
 sudo cp libgstrkfacedetect.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
@@ -68,8 +68,8 @@ gst-launch-1.0 rkv4l2src device=/dev/video4 ! video/x-raw,width=640,height=480,f
 
 ## 3.3 Face vectorize
 ```
-mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfacevectorize/build
-cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfacevectorize/build
+mkdir -p ~/ai_vision_model_rockchip_deploy/source/gst-rkfacevectorize/build
+cd ~/ai_vision_model_rockchip_deploy/source/gst-rkfacevectorize/build
 cmake ..
 make -j 6
 sudo cp libgstrkfacevectorize.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
@@ -77,8 +77,8 @@ sudo cp libgstrkfacevectorize.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
 ## 3.4 Face enroll new user
 ```
-mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfaceenroll/build
-cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkfaceenroll/build
+mkdir -p ~/ai_vision_model_rockchip_deploy/source/gst-rkfaceenroll/build
+cd ~/ai_vision_model_rockchip_deploy/source/gst-rkfaceenroll/build
 cmake ..
 make -j 6
 sudo cp libgstrkfaceenroll.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
@@ -86,8 +86,8 @@ sudo cp libgstrkfaceenroll.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0
 
 ## 3.5 Face Bounding Box draw
 ```
-mkdir -p /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkbboxdraw/build
-cd /home/rock/workspace/rockchip-deeplearning-practices/source/gst-rkbboxdraw/build
+mkdir -p ~/ai_vision_model_rockchip_deploy/source/gst-rkbboxdraw/build
+cd ~/ai_vision_model_rockchip_deploy/source/gst-rkbboxdraw/build
 cmake ..
 make -j 6
 sudo cp libgstrkbboxdraw.so /usr/lib/aarch64-linux-gnu/gstreamer-1.0/
@@ -122,4 +122,19 @@ gst-launch-1.0 rkv4l2src device=/dev/video4 ! video/x-raw,width=640,height=480,f
 ! rkfacedetect width=640 height=480 using_gpu=true ! queue \
 ! rkfacevectorize width=640 height=480 using_gpu=false \
 ! fakesink
+```
+
+- Test image
+```
+gst-launch-1.0 filesrc location=~/ai_vision_model_rockchip_deploy/test_data/face_640_480.jpeg ! jpegdec \
+! videoconvert ! video/x-raw,width=640,height=480,format=RGB ! queue \
+! imagefreeze ! autovideosink
+
+
+gst-launch-1.0 filesrc location=~/ai_vision_model_rockchip_deploy/test_data/face_640_480.jpeg ! jpegdec ! imagefreeze \
+! videoconvert ! video/x-raw,width=640,height=480,format=RGB ! queue \
+! rkfacedetect width=640 height=480 using_gpu=false \
+! tee name=videoTee \
+    videoTee.src_0 ! queue ! rkbboxdraw ! kmssink \
+    videoTee.src_1 ! queue ! rkfacevectorize width=640 height=480 using_gpu=false ! fakesink
 ```

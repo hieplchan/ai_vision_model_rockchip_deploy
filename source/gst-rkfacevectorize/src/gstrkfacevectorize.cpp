@@ -64,7 +64,7 @@
 
 #include "gstrkfacevectorize.h"
 
-InsightFaceInsightFace *face_vectorizer = nullptr;
+InsightFace *face_vectorizer = nullptr;
 gboolean using_gpu = false;
 
 GST_DEBUG_CATEGORY_STATIC (gst_rkfacevectorize_debug);

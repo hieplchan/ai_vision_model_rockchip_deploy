@@ -1,0 +1,3 @@
+/home/rock/ai_vision_model_rockchip_deploy/source/gst-rkfacevectorize/build/CMakeFiles/rebuild_cache.dir
+/home/rock/ai_vision_model_rockchip_deploy/source/gst-rkfacevectorize/build/CMakeFiles/gstrkfacevectorize.dir
+/home/rock/ai_vision_model_rockchip_deploy/source/gst-rkfacevectorize/build/CMakeFiles/edit_cache.dir
