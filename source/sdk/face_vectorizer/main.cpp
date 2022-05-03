@@ -34,7 +34,7 @@ int main() {
 
     // Compare different face
     cv::Mat face_score2 = face_vector_mat1 * face_vector_mat2.t();
-    std::cout << "Same face face_score2: " << face_score2 << std::endl;
+    std::cout << "Different face face_score2: " << face_score2 << std::endl;
 
     return 0;
 }
